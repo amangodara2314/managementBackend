@@ -37,4 +37,11 @@ StudentRouter.delete("/delete/:id", (req, res) => {
     .catch((err) => res.send(err));
 });
 
+StudentRouter.get("/class-students", (req, res) => {
+  new StudentController()
+    .getClassStudents(req.query.className, req.query.batch, req.query.date)
+    .then((success) => res.send(success))
+    .catch((err) => res.send(err));
+});
+
 module.exports = StudentRouter;

@@ -21,6 +21,91 @@ class StudentController {
       }
     });
   }
+
+  getClassStudents = async (cls, batch, date) => {
+    return new Promise(async (res, rej) => {
+      try {
+        if (!cls || !batch || !date) {
+          return rej({ msg: "Missing required parameters", status: 0 });
+        }
+        const attendanceDate = new Date(date);
+        if (isNaN(attendanceDate)) {
+          return rej({ msg: "Invalid date format", status: 0 });
+        }
+
+        const students = await Student.aggregate([
+          {
+            $match: { batchYear: batch, class: cls },
+          },
+          {
+            $lookup: {
+              from: "attendances",
+              let: { studentId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$student", "$$studentId"] },
+                        {
+                          $eq: [
+                            {
+                              $dateToString: {
+                                format: "%Y-%m-%d",
+                                date: "$date",
+                              },
+                            },
+                            attendanceDate.toISOString().split("T")[0], // Convert date for matching
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                },
+                {
+                  $project: { status: 1, _id: 0 }, // Fetch only attendance status
+                },
+              ],
+              as: "attendance",
+            },
+          },
+          {
+            $addFields: {
+              attendanceStatus: {
+                $cond: {
+                  if: { $gt: [{ $size: "$attendance" }, 0] },
+                  then: { $arrayElemAt: ["$attendance.status", 0] },
+                  else: "Not Marked",
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              class: 1,
+              batchYear: 1,
+              attendanceStatus: 1,
+            },
+          },
+        ]);
+
+        res({
+          msg: "Data found",
+          status: 1,
+          students,
+        });
+      } catch (error) {
+        console.error("Error fetching students with attendance:", error);
+        rej({
+          msg: "Internal Server Error",
+          status: 0,
+        });
+      }
+    });
+  };
+
   deleteStudent(id) {
     return new Promise(async (res, rej) => {
       try {

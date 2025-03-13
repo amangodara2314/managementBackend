@@ -6,6 +6,7 @@ const FeesPaidRouter = require("./routers/feesPaid.router");
 const StaffRouter = require("./routers/staff.router");
 const SalaryRouter = require("./routers/salary.router");
 const ExpenditureRouter = require("./routers/expenditure.router");
+const AttendanceRouter = require("./routers/attendance.router");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URL = "mongodb://localhost:27017";
@@ -18,6 +19,7 @@ app.use("/fees", FeesPaidRouter);
 app.use("/staff", StaffRouter);
 app.use("/salary", SalaryRouter);
 app.use("/expenditure", ExpenditureRouter);
+app.use("/attendance", AttendanceRouter);
 
 mongoose
   .connect(MONGODB_URL, { dbName: "FGC-MANAGEMENT" })
