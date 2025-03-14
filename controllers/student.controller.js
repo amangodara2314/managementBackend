@@ -28,6 +28,7 @@ class StudentController {
         if (!cls || !batch || !date) {
           return rej({ msg: "Missing required parameters", status: 0 });
         }
+
         const attendanceDate = new Date(date);
         if (isNaN(attendanceDate)) {
           return rej({ msg: "Invalid date format", status: 0 });
@@ -63,7 +64,7 @@ class StudentController {
                   },
                 },
                 {
-                  $project: { status: 1, _id: 0 }, // Fetch only attendance status
+                  $project: { status: 1, holidayReason: 1, _id: 0 }, // Include holidayReason
                 },
               ],
               as: "attendance",
@@ -78,6 +79,23 @@ class StudentController {
                   else: "Not Marked",
                 },
               },
+              holidayReason: {
+                $cond: {
+                  if: {
+                    $and: [
+                      { $gt: [{ $size: "$attendance" }, 0] },
+                      {
+                        $eq: [
+                          { $arrayElemAt: ["$attendance.status", 0] },
+                          "Holiday",
+                        ],
+                      },
+                    ],
+                  },
+                  then: { $arrayElemAt: ["$attendance.holidayReason", 0] },
+                  else: null,
+                },
+              },
             },
           },
           {
@@ -87,6 +105,7 @@ class StudentController {
               class: 1,
               batchYear: 1,
               attendanceStatus: 1,
+              holidayReason: 1, // Include in the response
             },
           },
         ]);
@@ -145,9 +164,10 @@ class StudentController {
         const student = new Student({
           studentId: data?.studentId,
           aadhar: data?.aadhar,
-          Rollnumber: data?.rollnumber,
+          Rollnumber: data?.Rollnumber,
           name: data?.name,
           dateOfBirth: data?.dateOfBirth,
+          janAadhar: data?.janAadhar,
           gender: data?.gender,
           category: data?.category,
           contactPhone: data?.contactPhone,
@@ -165,6 +185,7 @@ class StudentController {
           fees: data?.fees,
           totalFees: data?.totalFees,
           lastYearDueFees: data?.lastYearDueFees,
+          bankDetails: data?.bankDetails,
         });
         student
           .save()

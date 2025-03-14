@@ -5,6 +5,13 @@ const studentSchema = new Schema({
   studentId: { type: String },
   Rollnumber: { type: String },
   aadhar: { type: String },
+  janAadhar: { type: String },
+  bankDetails: {
+    accountNumber: { type: String },
+    ifscCode: { type: String },
+    bankName: { type: String },
+  },
+
   name: { type: String },
   dateOfBirth: { type: Date },
   gender: { type: String },
@@ -29,5 +36,13 @@ const studentSchema = new Schema({
 });
 
 const Student = mongoose.model("Student", studentSchema);
+
+studentSchema.pre("findOneAndDelete", async function (next) {
+  const student = await this.model.findOne(this.getFilter()); // Get the student being deleted
+  if (student) {
+    await Attendance.deleteMany({ student: student._id }); // Delete related attendance records
+  }
+  next();
+});
 
 module.exports = Student;

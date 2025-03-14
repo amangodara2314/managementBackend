@@ -9,7 +9,8 @@ const attendanceSchema = new Schema({
     enum: ["Present", "Absent", "Late", "Holiday"],
     required: true,
   },
-  remarks: { type: String }, // Optional field for additional notes
+  remarks: { type: String },
+  holidayReason: { type: String },
 });
 
 const Attendance = mongoose.model("Attendance", attendanceSchema);
