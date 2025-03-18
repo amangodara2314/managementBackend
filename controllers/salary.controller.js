@@ -23,13 +23,14 @@ class SalaryController {
     });
   }
 
-  addSalary({ staffId, amount, batch }) {
+  addSalary({ staffId, amount, batch, method }) {
     return new Promise(async (res, rej) => {
       try {
         const Paid = new Salary({
           staffId: staffId,
           amount: amount,
           batch: batch,
+          method: method,
         });
         const staff = await Staff.findById(staffId);
         staff.salaryPaid.push(Paid._id);
