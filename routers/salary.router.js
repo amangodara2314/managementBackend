@@ -16,4 +16,18 @@ SalaryRouter.post("/add", (req, res) => {
     .catch((err) => res.send(err));
 });
 
+SalaryRouter.put("/update", (req, res) => {
+  new SalaryController()
+    .updateSalary(req.body)
+    .then((success) => res.send(success))
+    .catch((err) => res.send(err));
+});
+
+SalaryRouter.delete("/delete/:id", (req, res) => {
+  new SalaryController()
+    .deleteSalary(req.params.id)
+    .then((success) => res.send(success))
+    .catch((err) => res.send(err));
+});
+
 module.exports = SalaryRouter;

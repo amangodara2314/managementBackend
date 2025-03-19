@@ -23,7 +23,7 @@ class SalaryController {
     });
   }
 
-  addSalary({ staffId, amount, batch, method }) {
+  addSalary({ staffId, amount, batch, method, date }) {
     return new Promise(async (res, rej) => {
       try {
         const Paid = new Salary({
@@ -31,6 +31,7 @@ class SalaryController {
           amount: amount,
           batch: batch,
           method: method,
+          date: date,
         });
         const staff = await Staff.findById(staffId);
         staff.salaryPaid.push(Paid._id);
@@ -47,6 +48,42 @@ class SalaryController {
           msg: "Internal Server Error",
           status: 0,
         });
+      }
+    });
+  }
+  updateSalary({ salaryId, amount, batch, method, date }) {
+    return new Promise(async (res, rej) => {
+      try {
+        const salary = await Salary.findById(salaryId);
+        if (!salary) {
+          return rej({ msg: "Salary record not found", status: 0 });
+        }
+        if (amount !== undefined) salary.amount = amount;
+        if (batch !== undefined) salary.batch = batch;
+        if (method !== undefined) salary.method = method;
+        if (date !== undefined) salary.date = date;
+
+        await salary.save();
+        res({ msg: "Salary Updated Successfully", status: 1, salary });
+      } catch (error) {
+        console.log(error);
+        rej({ msg: "Internal Server Error", status: 0 });
+      }
+    });
+  }
+
+  deleteSalary(salaryId) {
+    return new Promise(async (res, rej) => {
+      try {
+        const salary = await Salary.findById(salaryId);
+        if (!salary) {
+          return rej({ msg: "Salary record not found", status: 0 });
+        }
+        await Salary.findByIdAndDelete(salaryId);
+        res({ msg: "Salary Deleted Successfully", status: 1 });
+      } catch (error) {
+        console.log(error);
+        rej({ msg: "Internal Server Error", status: 0 });
       }
     });
   }
