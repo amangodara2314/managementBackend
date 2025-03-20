@@ -6,7 +6,7 @@ const attendanceSchema = new Schema({
   date: { type: Date, required: true },
   status: {
     type: String,
-    enum: ["Present", "Absent", "Late", "Holiday"],
+    enum: ["Present", "Absent", "Late", "Holiday", "Not Marked"],
     required: true,
   },
   remarks: { type: String },

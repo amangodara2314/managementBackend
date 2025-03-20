@@ -23,13 +23,14 @@ class SalaryController {
     });
   }
 
-  addSalary({ staffId, amount, batch, method, date }) {
+  addSalary({ staffId, amount, batch, method, date, remarks }) {
     return new Promise(async (res, rej) => {
       try {
         const Paid = new Salary({
           staffId: staffId,
           amount: amount,
           batch: batch,
+          remarks: remarks,
           method: method,
           date: date,
         });
@@ -51,7 +52,7 @@ class SalaryController {
       }
     });
   }
-  updateSalary({ salaryId, amount, batch, method, date }) {
+  updateSalary({ salaryId, amount, batch, method, date, remarks }) {
     return new Promise(async (res, rej) => {
       try {
         const salary = await Salary.findById(salaryId);
@@ -62,6 +63,7 @@ class SalaryController {
         if (batch !== undefined) salary.batch = batch;
         if (method !== undefined) salary.method = method;
         if (date !== undefined) salary.date = date;
+        if (remarks !== undefined) salary.remarks = remarks;
 
         await salary.save();
         res({ msg: "Salary Updated Successfully", status: 1, salary });

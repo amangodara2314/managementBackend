@@ -7,6 +7,7 @@ const SalarySchema = new Schema({
   method: { type: String },
   date: { type: Date, default: Date.now },
   batch: { type: String },
+  remarks: { type: String },
 });
 
 const Salary = mongoose.model("Salary", SalarySchema);
